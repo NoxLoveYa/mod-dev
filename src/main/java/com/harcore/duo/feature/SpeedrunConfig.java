@@ -29,7 +29,12 @@ public class SpeedrunConfig {
 		return settings.countdown;
 	}
 
+	public static int getMinPlayers() {
+		return settings.minPlayers;
+	}
+
 	private static class Settings {
 		int countdown = 5;
+		int minPlayers = 2;
 	}
 }

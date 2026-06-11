@@ -1,3 +1,4 @@
 {
-  "countdown": 5
+  "countdown": 5,
+  "minPlayers": 1
 }

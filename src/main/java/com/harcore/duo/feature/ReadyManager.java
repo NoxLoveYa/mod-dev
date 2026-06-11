@@ -47,9 +47,8 @@ public class ReadyManager {
 				}
 				readyPlayers.add(player.getUUID());
 				var server = ctx.getSource().getServer();
-				var total = server.getPlayerList().getPlayerCount();
 				server.getPlayerList().broadcastSystemMessage(
-						Component.literal("§a" + player.getScoreboardName() + " is ready! §7(" + readyPlayers.size() + "/" + total + ")"),
+						Component.literal("§a" + player.getScoreboardName() + " is ready! §7(" + readyPlayers.size() + "/" + SpeedrunConfig.getMinPlayers() + ")"),
 						false
 				);
 				return 1;
@@ -84,8 +83,9 @@ public class ReadyManager {
 					lastTitleTick = (int) server.getTickCount();
 					int total = players.size();
 					int ready = (int) players.stream().filter(p -> readyPlayers.contains(p.getUUID())).count();
+					int min = SpeedrunConfig.getMinPlayers();
 					var title = Component.literal("§eWaiting for players");
-					var sub = Component.literal("§f" + ready + " §7/ §f" + total + "   §7type §f/ready");
+					var sub = Component.literal("§f" + ready + " §7/ §f" + min + "   §7type §f/ready");
 					for (var player : players) {
 						player.connection.send(new ClientboundSetTitleTextPacket(title));
 						player.connection.send(new ClientboundSetSubtitleTextPacket(sub));
@@ -94,14 +94,16 @@ public class ReadyManager {
 				}
 
 				if (!countingDown) {
-					boolean allReady = true;
+					boolean allReady = !players.isEmpty();
 					for (var player : players) {
 						if (!readyPlayers.contains(player.getUUID())) {
 							allReady = false;
 							break;
 						}
 					}
-					if (allReady) {
+					int readyCount = readyPlayers.size();
+					int totalOnline = players.size();
+					if (allReady && readyCount >= SpeedrunConfig.getMinPlayers()) {
 						countingDown = true;
 						countdownTick = server.getTickCount();
 						lastBroadcastedSecond = -1;
