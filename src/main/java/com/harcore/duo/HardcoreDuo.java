@@ -16,6 +16,6 @@ public class HardcoreDuo implements ModInitializer {
 	public void onInitialize() {
 		GlowManager.register();
 		SidebarManager.register();
-		LOGGER.info("Hardcore Duo initialized!");
+		LOGGER.info("Hardcore Speedrun initialized!");
 	}
 }

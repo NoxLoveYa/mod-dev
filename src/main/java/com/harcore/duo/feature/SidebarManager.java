@@ -4,11 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.numbers.BlankFormat;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.scores.DisplaySlot;
-import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.ScoreHolder;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 
@@ -27,6 +25,7 @@ public class SidebarManager {
 	private static final List<ScoreHolder> currentHolders = new ArrayList<>();
 	private static final Map<String, String> placeholders = new HashMap<>();
 	private static List<String> rawLines = List.of();
+	private static String titleText = "";
 
 	public static void register() {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -51,8 +50,9 @@ public class SidebarManager {
 			return;
 		}
 		rawLines = config.lines;
-		setupObjective(server, config.title);
-		applyLines(server);
+		titleText = config.title;
+		setPlaceholder("players", String.valueOf(server.getPlayerList().getPlayerCount()));
+		setupObjective(server);
 	}
 
 	private static Config loadConfig(MinecraftServer server) {
@@ -67,35 +67,53 @@ public class SidebarManager {
 		}
 	}
 
-	private static void setupObjective(MinecraftServer server, String title) {
+	private static void setupObjective(MinecraftServer server) {
 		var scoreboard = server.getScoreboard();
-		var objective = scoreboard.getObjective(OBJECTIVE_NAME);
-		if (objective == null) {
-			objective = scoreboard.addObjective(
-					OBJECTIVE_NAME,
-					ObjectiveCriteria.DUMMY,
-					GradientText.of(title),
-					ObjectiveCriteria.DUMMY.getDefaultRenderType(),
-					false,
-					null
-			);
+		var old = scoreboard.getObjective(OBJECTIVE_NAME);
+		if (old != null) {
+			scoreboard.removeObjective(old);
 		}
+		var objective = scoreboard.addObjective(
+				OBJECTIVE_NAME,
+				ObjectiveCriteria.DUMMY,
+				GradientText.of(titleText),
+				ObjectiveCriteria.DUMMY.getDefaultRenderType(),
+				false,
+				null
+		);
 		objective.setNumberFormat(BlankFormat.INSTANCE);
 		scoreboard.setDisplayObjective(DisplaySlot.SIDEBAR, objective);
+
+		currentHolders.clear();
+		var resolved = resolvePlaceholders(rawLines);
+		int score = resolved.size();
+		for (var line : resolved) {
+			var holder = ScoreHolder.forNameOnly(line);
+			scoreboard.getOrCreatePlayerScore(holder, objective).set(score--);
+			currentHolders.add(holder);
+		}
 	}
 
 	public static void applyLines(MinecraftServer server) {
 		var scoreboard = server.getScoreboard();
-		var objective = scoreboard.getObjective(OBJECTIVE_NAME);
-		if (objective == null) {
+		var old = scoreboard.getObjective(OBJECTIVE_NAME);
+		if (old == null) {
 			return;
 		}
+		scoreboard.removeObjective(old);
 
-		for (var holder : currentHolders) {
-			scoreboard.getOrCreatePlayerScore(holder, objective).set(0);
-		}
+		var objective = scoreboard.addObjective(
+				OBJECTIVE_NAME,
+				ObjectiveCriteria.DUMMY,
+				GradientText.of(titleText),
+				ObjectiveCriteria.DUMMY.getDefaultRenderType(),
+				false,
+				null
+		);
+		objective.setNumberFormat(BlankFormat.INSTANCE);
+		scoreboard.setDisplayObjective(DisplaySlot.SIDEBAR, objective);
+
 		currentHolders.clear();
-
 		var resolved = resolvePlaceholders(rawLines);
 		int score = resolved.size();
 		for (var line : resolved) {

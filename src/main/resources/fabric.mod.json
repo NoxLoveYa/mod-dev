@@ -2,8 +2,8 @@
 	"schemaVersion": 1,
 	"id": "hardcore-duo",
 	"version": "${version}",
-	"name": "Hardcore-Duo",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Hardcore-Speedrun",
+	"description": "Speedrun helper mod — player glow, scoreboard sidebar, and more.",
 	"authors": [
 		"Me!"
 	],

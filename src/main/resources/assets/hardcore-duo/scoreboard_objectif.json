@@ -1,10 +1,10 @@
 {
-  "title": "Hardcore Duo",
+  "title": "Hardcore Speedrun",
   "lines": [
     "§b Players: §f{players}",
     "",
     "§e Timer: §f{time}",
     "",
-    "§7 hardcore-duo"
+    "§c Ein Diddy Goon !!!"
   ]
 }
