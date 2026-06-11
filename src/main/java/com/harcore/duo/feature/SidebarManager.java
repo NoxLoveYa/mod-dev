@@ -26,6 +26,7 @@ public class SidebarManager {
 	private static final Map<String, String> placeholders = new HashMap<>();
 	private static List<String> rawLines = List.of();
 	private static String titleText = "";
+	private static List<String> lastResolved = List.of();
 
 	public static void register() {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -52,6 +53,7 @@ public class SidebarManager {
 		}
 		rawLines = config.lines;
 		titleText = config.title;
+		lastResolved = List.of();
 		setPlaceholder("players", String.valueOf(server.getPlayerList().getPlayerCount()));
 		setupObjective(server);
 	}
@@ -96,12 +98,17 @@ public class SidebarManager {
 	}
 
 	public static void applyLines(MinecraftServer server) {
-		var scoreboard = server.getScoreboard();
-		var old = scoreboard.getObjective(OBJECTIVE_NAME);
-		if (old == null) {
+		var resolved = resolvePlaceholders(rawLines);
+		if (resolved.equals(lastResolved)) {
 			return;
 		}
-		scoreboard.removeObjective(old);
+		lastResolved = resolved;
+
+		var scoreboard = server.getScoreboard();
+		var old = scoreboard.getObjective(OBJECTIVE_NAME);
+		if (old != null) {
+			scoreboard.removeObjective(old);
+		}
 
 		var objective = scoreboard.addObjective(
 				OBJECTIVE_NAME,
@@ -115,7 +122,6 @@ public class SidebarManager {
 		scoreboard.setDisplayObjective(DisplaySlot.SIDEBAR, objective);
 
 		currentHolders.clear();
-		var resolved = resolvePlaceholders(rawLines);
 		int score = resolved.size();
 		for (var line : resolved) {
 			var holder = ScoreHolder.forNameOnly(line);
