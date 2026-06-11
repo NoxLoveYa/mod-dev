@@ -92,6 +92,7 @@ tasks.register('deploy', Copy) {
 	from(remapJar.archiveFile) {
 		into 'mods'
 	}
-	from("src/main/resources/assets/hardcore-duo/scoreboard_objectif.json")
+	from("src/main/resources/assets/hardcore-duo/speedrun_scoreboard_objectif.json")
+	from("src/main/resources/assets/hardcore-duo/speedrun_settings.json")
 	into "C:/Users/ewanr/Downloads/serv test"
 }

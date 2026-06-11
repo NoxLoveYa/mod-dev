@@ -3,6 +3,7 @@ package com.harcore.duo;
 import net.fabricmc.api.ModInitializer;
 
 import com.harcore.duo.feature.GlowManager;
+import com.harcore.duo.feature.ReadyManager;
 import com.harcore.duo.feature.SidebarManager;
 
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ public class HardcoreDuo implements ModInitializer {
 	public void onInitialize() {
 		GlowManager.register();
 		SidebarManager.register();
+		ReadyManager.register();
 		LOGGER.info("Hardcore Speedrun initialized!");
 	}
 }

@@ -20,7 +20,7 @@ import java.util.Map;
 public class SidebarManager {
 
 	private static final String OBJECTIVE_NAME = "hardcore-duo.sidebar";
-	private static final String CONFIG_FILENAME = "scoreboard_objectif.json";
+	private static final String CONFIG_FILENAME = "speedrun_scoreboard_objectif.json";
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static final List<ScoreHolder> currentHolders = new ArrayList<>();
 	private static final Map<String, String> placeholders = new HashMap<>();
@@ -29,6 +29,7 @@ public class SidebarManager {
 
 	public static void register() {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			SpeedrunConfig.load(server);
 			reload(server);
 		});
 
