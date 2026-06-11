@@ -5,6 +5,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;
@@ -21,6 +24,7 @@ public class ReadyManager {
 	private static boolean countingDown = false;
 	private static long countdownTick = 0;
 	private static int lastBroadcastedSecond = -1;
+	private static int lastTitleTick = 0;
 	private static long startTime = 0;
 
 	public static void register() {
@@ -76,6 +80,19 @@ public class ReadyManager {
 					player.connection.teleport(pos[0], pos[1], pos[2], (float) pos[3], (float) pos[4]);
 				}
 
+				if (!countingDown && server.getTickCount() - lastTitleTick >= 20) {
+					lastTitleTick = (int) server.getTickCount();
+					int total = players.size();
+					int ready = (int) players.stream().filter(p -> readyPlayers.contains(p.getUUID())).count();
+					var title = Component.literal("§eWaiting for players");
+					var sub = Component.literal("§f" + ready + " §7/ §f" + total + "   §7type §f/ready");
+					for (var player : players) {
+						player.connection.send(new ClientboundSetTitleTextPacket(title));
+						player.connection.send(new ClientboundSetSubtitleTextPacket(sub));
+						player.connection.send(new ClientboundSetTitlesAnimationPacket(0, 40, 10));
+					}
+				}
+
 				if (!countingDown) {
 					boolean allReady = true;
 					for (var player : players) {
@@ -91,6 +108,11 @@ public class ReadyManager {
 						server.getPlayerList().broadcastSystemMessage(
 								Component.literal("§eAll players ready! Starting in §c" + SpeedrunConfig.getCountdown() + "§e..."), false
 						);
+						for (var player : players) {
+							player.connection.send(new ClientboundSetTitleTextPacket(Component.empty()));
+							player.connection.send(new ClientboundSetSubtitleTextPacket(Component.empty()));
+							player.connection.send(new ClientboundSetTitlesAnimationPacket(0, 0, 0));
+						}
 					}
 				}
 
