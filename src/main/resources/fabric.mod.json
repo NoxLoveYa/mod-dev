@@ -17,17 +17,10 @@
 	"entrypoints": {
 		"main": [
 			"com.harcore.duo.HardcoreDuo"
-		],
-		"client": [
-			"com.harcore.duo.client.HardcoreDuoClient"
 		]
 	},
 	"mixins": [
-		"hardcore-duo.mixins.json",
-		{
-			"config": "hardcore-duo.client.mixins.json",
-			"environment": "client"
-		}
+		"hardcore-duo.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",

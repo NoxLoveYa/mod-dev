@@ -1,0 +1,10 @@
+{
+  "title": "Hardcore Duo",
+  "lines": [
+    "§b Players: §f{players}",
+    "",
+    "§e Timer: §f{time}",
+    "",
+    "§7 hardcore-duo"
+  ]
+}

@@ -85,3 +85,13 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+tasks.register('deploy', Copy) {
+	dependsOn build
+	doNotTrackState("Destination is outside project")
+	from(remapJar.archiveFile) {
+		into 'mods'
+	}
+	from("src/main/resources/assets/hardcore-duo/scoreboard_objectif.json")
+	into "C:/Users/ewanr/Downloads/serv test"
+}
