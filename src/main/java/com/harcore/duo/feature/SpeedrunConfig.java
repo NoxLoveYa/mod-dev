@@ -33,8 +33,17 @@ public class SpeedrunConfig {
 		return settings.minPlayers;
 	}
 
+	public static int getSpawnX() { return settings.spawnX; }
+	public static int getSpawnY() { return settings.spawnY; }
+	public static int getSpawnZ() { return settings.spawnZ; }
+	public static int getResetRadius() { return settings.resetRadius; }
+
 	private static class Settings {
 		int countdown = 5;
 		int minPlayers = 2;
+		int spawnX = 0;
+		int spawnY = 70;
+		int spawnZ = 0;
+		int resetRadius = 200;
 	}
 }

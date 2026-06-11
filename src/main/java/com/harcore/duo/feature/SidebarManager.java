@@ -31,7 +31,9 @@ public class SidebarManager {
 	public static void register() {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			SpeedrunConfig.load(server);
+			BestTime.load(server);
 			reload(server);
+			BestTime.updatePlaceholder(server);
 		});
 
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
